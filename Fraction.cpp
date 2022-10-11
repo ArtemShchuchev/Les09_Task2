@@ -167,3 +167,10 @@ Fraction Fraction::operator--(int num)
 	exception(*this); // проверка исключений
 	return retThis;
 }
+
+// унарный -
+Fraction Fraction::operator-()
+{
+	this->numerator_ *= -1;
+	return (*this);
+}

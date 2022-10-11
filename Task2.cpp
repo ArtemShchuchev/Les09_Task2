@@ -77,6 +77,9 @@ int main(int argc, char** argv)
 		std::cout << "Значение дроби 1 = ";
 		printFraction(f1); std::cout << std::endl << std::endl;
 
+		temp = -f1;
+		printFraction(temp); std::cout << std::endl;
+
 
 		/*
 		std::cout << "f1" << ((f1 == f2) ? " == " : " not == ") << "f2" << '\n';

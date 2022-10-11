@@ -33,4 +33,6 @@ public:
 	Fraction operator ++ (int);
 	Fraction operator -- ();
 	Fraction operator -- (int);
+
+	Fraction operator - ();
 };
