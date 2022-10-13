@@ -95,6 +95,11 @@ Fraction::Fraction(int numerator, int denominator)
 	numerator_ = numerator;
 	denominator_ = denominator;
 	whole_ = 0;
+	if (denominator_ < 0) // проверка/правка знаков
+	{
+		denominator_ *= -1;
+		numerator_ *= -1;
+	}
 	exception(*this);		// проверка исключений
 	toProperFract(*this);	// в правильную дробь
 }
