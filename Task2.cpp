@@ -16,7 +16,6 @@ int main(int argc, char** argv)
 	try
 	{
 		int numerator = 0, denominator = 0;
-
 		numerator = userInput("Введите числитель дроби 1: ");
 		denominator = userInput("Введите знаменатель дроби 1: ");
 		Fraction f1(numerator, denominator);
@@ -24,6 +23,15 @@ int main(int argc, char** argv)
 		numerator = userInput("Введите числитель дроби 2: ");
 		denominator = userInput("Введите знаменатель дроби 2: ");
 		Fraction f2(numerator, denominator);
+		
+		/*
+		std::cout << "f1" << ((f1 == f2) ? " == " : " not == ") << "f2" << '\n';
+		std::cout << "f1" << ((f1 != f2) ? " != " : " not != ") << "f2" << '\n';
+		std::cout << "f1" << ((f1 < f2) ? " < " : " not < ") << "f2" << '\n';
+		std::cout << "f1" << ((f1 > f2) ? " > " : " not > ") << "f2" << '\n';
+		std::cout << "f1" << ((f1 <= f2) ? " <= " : " not <= ") << "f2" << '\n';
+		std::cout << "f1" << ((f1 >= f2) ? " >= " : " not >= ") << "f2" << '\n';
+		*/
 
 		printFraction(f1); std::cout << " + "; printFraction(f2);
 		std::cout << " = ";
@@ -78,17 +86,8 @@ int main(int argc, char** argv)
 		printFraction(f1); std::cout << std::endl << std::endl;
 
 		temp = -f1;
+		std::cout << "Отрицание дроби 1 = ";
 		printFraction(temp); std::cout << std::endl;
-
-
-		/*
-		std::cout << "f1" << ((f1 == f2) ? " == " : " not == ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 != f2) ? " != " : " not != ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 < f2) ? " < " : " not < ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 > f2) ? " > " : " not > ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 <= f2) ? " <= " : " not <= ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 >= f2) ? " >= " : " not >= ") << "f2" << '\n';
-		*/
 	}
 	catch (std::domain_error& err)
 	{
@@ -139,5 +138,19 @@ void printFraction(Fraction& fr)
 {
 	using namespace std;
 
-	cout << fr.getNumer() << "/" << fr.getDenom();
+	if (fr.getWhole())
+	{
+		cout << fr.getWhole();
+		if (fr.getNumer())
+		{
+			cout << "("
+				<< fr.getNumer() << "/"
+				<< fr.getDenom() << ")";
+		}
+	}
+	else
+	{
+		if (fr.getNumer()) cout << fr.getNumer() << "/" << fr.getDenom();
+		else cout << "0";
+	}
 }

@@ -1,26 +1,92 @@
 #include "Fraction.h"
 
 
-double Fraction::div() { return numerator_ / denominator_; }
-
-void Fraction::reductFract(Fraction& fr)
+double Fraction::div()
 {
-	int temp_denom = fr.denominator_;
-	while (temp_denom > 1)
+	exception(*this); // проверка исключений
+	toImproperFract(*this);	// в неправильную дробь
+
+	double temp = static_cast<double>(numerator_) / denominator_;
+
+	toProperFract(*this);	// в правильную дробь
+	return temp;
+}
+
+//	Привожу к правильной дроби
+//		105		  3		  1
+//		---	->	17-	->	17-
+//		 6		  6		  2
+void Fraction::toProperFract(Fraction& f)
+{
+	exception(f); // проверка исключений
+
+	if (f.numerator_ / f.denominator_)	// если дробь неправильная
 	{
-		if (!(fr.numerator_ % temp_denom) && !(fr.denominator_ % temp_denom))
+		int znak = 1;	// предположу, что число положительное
+		if (f.whole_ < 0)
 		{
-			fr.numerator_ /= temp_denom;
-			fr.denominator_ /= temp_denom;
+			f.whole_ *= -1;		// модуль числа
+			znak = -1;			// число отрицательное
+		}
+		if (f.numerator_ < 0)
+		{
+			f.numerator_ *= -1;	// модуль числа
+			znak = -1;			// число отрицательное
+		}
+
+		f.whole_ += f.numerator_ / f.denominator_;
+		f.numerator_ %= f.denominator_;
+		f.whole_ *= znak;		// вернул знак
+	}
+
+	// упрощаю дробь (ищу общий множитель)
+	int multiplier = f.numerator_ < 0 ? f.numerator_ * -1 : f.numerator_;
+	while (multiplier > 1)
+	{
+		// если знаменатель делится на multiplier без остатка
+		// и числитель делится на multiplier без остатка
+		if (!(f.denominator_ % multiplier) && !(f.numerator_ % multiplier))
+		{
+			f.numerator_ /= multiplier;
+			f.denominator_ /= multiplier;
 			break;
 		}
-		--temp_denom;
+		--multiplier;
 	};
+}
+
+//	Привожу к НЕправильной дроби
+//		 1		7
+//		2-	->	-
+//		 3		3
+void Fraction::toImproperFract(Fraction& f)
+{
+	if (f.whole_)	// если дробь правильная
+	{
+		int znak = 1;	// предположу, что число положительное
+		if (f.whole_ < 0)
+		{
+			f.whole_ *= -1;		// модуль числа
+			znak = -1;			// число отрицательное
+		}
+		if (f.numerator_ < 0)
+		{
+			f.numerator_ *= -1;	// модуль числа
+			znak = -1;			// число отрицательное
+		}
+
+		f.numerator_ += f.whole_ * f.denominator_;
+		f.whole_ = 0;
+		f.numerator_ *= znak;	// вернул знак
+	}
 }
 
 void Fraction::exception(Fraction& fr)
 {
-	if (fr.numerator_ == 0) throw std::domain_error("Числитель = 0, решения не существует.");
+	if ( !(fr.whole_ || fr.numerator_) && fr.denominator_ == 0 )
+	{
+		throw std::domain_error("Числитель и знаменатель = 0, решения не существует.");
+	}
 	if (fr.denominator_ == 0) throw std::overflow_error("Делитель = 0, решение стремится к бесконечности.");
 }
 
@@ -28,14 +94,22 @@ Fraction::Fraction(int numerator, int denominator)
 {
 	numerator_ = numerator;
 	denominator_ = denominator;
+	whole_ = 0;
+	exception(*this);		// проверка исключений
+	toProperFract(*this);	// в правильную дробь
+}
+
+Fraction::Fraction(int whole)
+{
+	numerator_ = 0;
+	denominator_ = 1;
+	whole_ = whole;
 	exception(*this); // проверка исключений
 }
 
-Fraction::Fraction(int num)
+int Fraction::getWhole()
 {
-	numerator_ = num;
-	denominator_ = num;
-	exception(*this); // проверка исключений
+	return whole_;
 }
 
 int Fraction::getNumer()
@@ -76,69 +150,108 @@ bool Fraction::operator >= (Fraction fr)
 	return !(div() < fr.div());
 }
 
-Fraction Fraction::operator + (const Fraction& fr)
+Fraction Fraction::operator + (Fraction second)
 {
-	Fraction tempFr = fr;
-	if (denominator_ != fr.denominator_) // приведение к общ. знаменателю
-	{
-		tempFr.numerator_ *= denominator_;
-		tempFr.numerator_ += numerator_ * fr.denominator_;
-		tempFr.denominator_ *= denominator_;
-	}
-	else tempFr.numerator_ += numerator_; // общий знаменатель
-
-	reductFract(tempFr); // сокращение дроби
-	exception(tempFr); // проверка исключений
-
-	return tempFr;
-}
-
-Fraction Fraction::operator - (const Fraction& fr)
-{
-	Fraction tempFr = fr;
-	if (denominator_ != fr.denominator_) // приведение к общ. знаменателю
-	{
-		tempFr.numerator_ *= denominator_;
-		tempFr.numerator_ = numerator_ * fr.denominator_ - tempFr.numerator_;
-		tempFr.denominator_ *= denominator_;
-	}
-	else tempFr.numerator_ = numerator_ - tempFr.numerator_; // общий знаменатель
-
-	reductFract(tempFr); // сокращение дроби
-	exception(tempFr); // проверка исключений
-
-	return tempFr;
-}
-
-Fraction Fraction::operator * (const Fraction& fr)
-{
-	Fraction tempFr = fr;
+	Fraction first = *this;
 	
-	tempFr.numerator_ *= numerator_;
-	tempFr.denominator_ *= denominator_;
+	// в неправильные дроби
+	toImproperFract(first);
+	toImproperFract(second);
+	
+	// приведение к общ. знаменателю
+	if (first.denominator_ != second.denominator_)
+	{
+		first.numerator_ *= second.denominator_;
+		second.numerator_ *= first.denominator_;
+		// второй знаменатель - не важен
+		first.denominator_ *= second.denominator_;
+		//second.denominator_ = first.denominator_;
+	}
+	
+	// при общем знаменателе
+	first.numerator_ += second.numerator_;
+	
+	// в правильную дробь
+	toProperFract(first);
 
-	reductFract(tempFr); // сокращение дроби
-
-	return tempFr;
+	return first;
 }
 
-Fraction Fraction::operator / (const Fraction& fr)
+Fraction Fraction::operator - (Fraction second)
 {
-	Fraction tempFr = fr;
-	
-	tempFr.numerator_ = numerator_ * fr.denominator_;
-	tempFr.denominator_ = denominator_ * fr.numerator_;
+	Fraction first = *this;
 
-	reductFract(tempFr); // сокращение дроби
+	// в неправильные дроби
+	toImproperFract(first);
+	toImproperFract(second);
 
-	return tempFr;
+	// приведение к общ. знаменателю
+	if (first.denominator_ != second.denominator_)
+	{
+		first.numerator_ *= second.denominator_;
+		second.numerator_ *= first.denominator_;
+		// второй знаменатель - не важен
+		first.denominator_ *= second.denominator_;
+		//second.denominator_ = first.denominator_;
+	}
+
+	// при общем знаменателе
+	first.numerator_ -= second.numerator_;
+
+	// в правильную дробь
+	toProperFract(first);
+
+	return first;
+}
+
+Fraction Fraction::operator * (Fraction fr)
+{
+	// в неправильные дроби
+	toImproperFract(*this);
+	toImproperFract(fr);
+
+	fr.numerator_ *= this->numerator_;
+	fr.denominator_ *= this->denominator_;
+
+	// в правильную дробь
+	toProperFract(*this);
+	toProperFract(fr);
+
+	return fr;
+}
+
+Fraction Fraction::operator / (Fraction fr)
+{
+	// в неправильные дроби
+	toImproperFract(*this);
+	toImproperFract(fr);
+
+	int znak = 1;	// предположу, что число положительное
+	int tempDenom = fr.denominator_; // сохранаю делитель
+
+	// знаменатель = числитель_2 * знаменатель_1
+	fr.denominator_ = fr.numerator_ * this->denominator_;
+	if (fr.numerator_ < 0) // проверяю знак числителя_2
+	{
+		fr.denominator_ *= -1;	// модуль числа
+		znak *= -1;					// поменял знак
+	}
+	// числитель = числитель_1 * знаменатель_2
+	fr.numerator_ = this->numerator_ * tempDenom;
+	// числитель 1, на знак проверять не надо
+	fr.numerator_ *= znak;		// восстановил знак
+
+	// в правильную дробь
+	toProperFract(*this);
+	toProperFract(fr);
+
+	return fr;
 }
 
 // префиксный ++
 Fraction Fraction::operator++()
 {
 	*this = (*this) + 1;
-	exception(*this); // проверка исключений
 	return *this;
 }
 
@@ -147,7 +260,6 @@ Fraction Fraction::operator++(int num)
 {
 	Fraction temp = (*this);
 	++(*this);	// использую префиксную перегрузку
-	exception(*this); // проверка исключений
 	return temp;
 }
 
@@ -155,7 +267,6 @@ Fraction Fraction::operator++(int num)
 Fraction Fraction::operator--()
 {
 	*this = (*this) - 1;
-	exception(*this); // проверка исключений
 	return *this;
 }
 
@@ -164,13 +275,12 @@ Fraction Fraction::operator--(int num)
 {
 	Fraction retThis = (*this);
 	--(*this);	// использую префиксную перегрузку
-	exception(*this); // проверка исключений
 	return retThis;
 }
 
 // унарный -
 Fraction Fraction::operator-()
 {
-	this->numerator_ *= -1;
+	*this = *this * -1;
 	return (*this);
 }

@@ -5,16 +5,19 @@
 class Fraction
 {
 private:
-	int numerator_;
-	int denominator_;
+	int whole_;			// целая часть
+	int numerator_;		// числитель
+	int denominator_;	// знаменатель
 	double div();
-	void reductFract(Fraction&); // сокращение дроби по ссылке
-	void exception(Fraction&);
+	void toProperFract(Fraction&);		// в правильную дробь
+	void toImproperFract(Fraction&);	// в неправильную дробь
+	void exception(Fraction&);			// проверка исключений
 
 public:
 	Fraction(int numerator, int denominator);
-	Fraction(int num);
+	Fraction(int whole);
 
+	int getWhole();
 	int getNumer();
 	int getDenom();
 
@@ -25,10 +28,10 @@ public:
 	bool operator <= (Fraction);
 	bool operator >= (Fraction);
 
-	Fraction operator + (const Fraction&);
-	Fraction operator - (const Fraction&);
-	Fraction operator * (const Fraction&);
-	Fraction operator / (const Fraction&);
+	Fraction operator + (Fraction);
+	Fraction operator - (Fraction);
+	Fraction operator * (Fraction);
+	Fraction operator / (Fraction);
 	Fraction operator ++ ();
 	Fraction operator ++ (int);
 	Fraction operator -- ();
