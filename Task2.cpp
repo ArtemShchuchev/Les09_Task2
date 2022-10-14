@@ -24,14 +24,6 @@ int main(int argc, char** argv)
 		denominator = userInput("Введите знаменатель дроби 2: ");
 		Fraction f2(numerator, denominator);
 		
-		/*
-		std::cout << "f1" << ((f1 == f2) ? " == " : " not == ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 != f2) ? " != " : " not != ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 < f2) ? " < " : " not < ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 > f2) ? " > " : " not > ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 <= f2) ? " <= " : " not <= ") << "f2" << '\n';
-		std::cout << "f1" << ((f1 >= f2) ? " >= " : " not >= ") << "f2" << '\n';
-		*/
 
 		printFraction(f1); std::cout << " + "; printFraction(f2);
 		std::cout << " = ";

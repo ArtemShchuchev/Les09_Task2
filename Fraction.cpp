@@ -127,34 +127,6 @@ int Fraction::getDenom()
 	return denominator_;
 }
 
-bool Fraction::operator == (Fraction fr)
-{
-	// сравнивает отдельно каждое поле класса
-	// предварительно выполнив деление
-	return (div() == fr.div());
-}
-bool Fraction::operator != (Fraction fr)
-{
-	// сравнивает целиком объекты с помощью перегруженного ==
-	return !(*this == fr);
-}
-bool Fraction::operator < (Fraction fr)
-{
-	return (div() < fr.div());
-}
-bool Fraction::operator > (Fraction fr)
-{
-	return (fr.div() < div());
-}
-bool Fraction::operator <= (Fraction fr)
-{
-	return !(div() > fr.div());
-}
-bool Fraction::operator >= (Fraction fr)
-{
-	return !(div() < fr.div());
-}
-
 Fraction Fraction::operator + (Fraction second)
 {
 	Fraction first = *this;

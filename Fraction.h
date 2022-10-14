@@ -21,13 +21,6 @@ public:
 	int getNumer();
 	int getDenom();
 
-	bool operator == (Fraction);
-	bool operator != (Fraction);
-	bool operator < (Fraction);
-	bool operator > (Fraction);
-	bool operator <= (Fraction);
-	bool operator >= (Fraction);
-
 	Fraction operator + (Fraction);
 	Fraction operator - (Fraction);
 	Fraction operator * (Fraction);
